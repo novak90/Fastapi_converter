@@ -1,27 +1,25 @@
 from fastapi import FastAPI
-# ИЗМЕНЕНИЕ ЗДЕСЬ: используем абсолютный импорт
-from app.xml import router as xml_router
+from app.xml import router as soap_router
+from app.rest import router as rest_router  # новый импорт
 
-# Создаём экземпляр приложения
 app = FastAPI(
-    title="SOAP Converter",
-    description="Конвертер SOAP-запросов в JSON и XML",
+    title="SOAP/JSON Converter",
+    description="Конвертер между SOAP и JSON",
     version="1.0.0"
 )
 
-# Подключаем роутер с префиксом /soap
-app.include_router(xml_router, prefix="/soap", tags=["soap"])
+# Подключаем оба роутера
+app.include_router(soap_router, prefix="/soap", tags=["soap"])
+app.include_router(rest_router, prefix="/rest", tags=["rest"])  # новый роутер
 
-# Корневой эндпоинт для проверки
 @app.get("/")
 async def root():
     return {
-        "message": "SOAP Converter",
+        "message": "Converter by Брат Валера",
         "endpoints": {
-            "/soap": "POST: Принимает SOAP, возвращает JSON (по умолчанию)",
-            "/soap?format=json": "POST: Принимает SOAP, возвращает JSON",
+            "/soap": "POST: Принимает SOAP, возвращает JSON",
             "/soap?format=xml": "POST: Принимает SOAP, возвращает XML",
-            "/docs": "Документация Swagger",
-            "/redoc": "Документация ReDoc"
+            "/rest": "POST: Принимает JSON, возвращает SOAP",
+            "/docs": "Документация Swagger"
         }
     }
